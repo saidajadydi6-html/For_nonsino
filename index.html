@@ -68,12 +68,6 @@ button {
   0% {transform: translateY(100vh) rotate(0deg);}
   100% {transform: translateY(-10vh) rotate(360deg);}
 }
-
-/* Fade-in for love message */
-@keyframes fadeIn {
-  0% {opacity:0; transform:scale(0.8);}
-  100% {opacity:1; transform:scale(1);}
-}
 </style>
 </head>
 <body>
@@ -84,12 +78,11 @@ button {
   <button onclick="startMusic()">Next</button>
 </section>
 
-<!-- Page 2: ilyass...  Do you love me -->
+<!-- Page 2: Do you love me -->
 <section id="page2">
-  <h1>ilyass...  Do you love me? 😻</h1>
+  <h1>Do you love me? 😻</h1>
   <button onclick="loveYes()">Yes 💖</button>
   <button onclick="alert('Try again 😉')">No ❌</button>
-  <div id="loveMsg" style="margin-top:20px; font-size:24px; color:#ffebef; display:none; animation: fadeIn 2s;"></div>
 </section>
 
 <!-- Page 3: Secret code -->
@@ -115,7 +108,7 @@ button {
 </section>
 
 <!-- Music -->
-<audio id="music" src="CinnamonGirl.mp3" loop></audio>
+<audio id="music" src="CinnamonGirl.mp3" loop autoplay></audio>
 
 <script>
 // ===== Variables =====
@@ -141,27 +134,15 @@ const questions=[
 function showPage(id){document.querySelectorAll('section').forEach(s=>s.style.display='none'); document.getElementById(id).style.display='block';}
 function nextPage(id){showPage(id);}
 
-// ===== Page 1: start music + next page =====
-function startMusic(){
-  document.getElementById("music").play().catch(e=>console.log(e));
-  nextPage('page2');
-}
+// ===== Page 1: autoplay music + speed 1.75 =====
+const music = document.getElementById("music");
+window.addEventListener('DOMContentLoaded', () => {
+  music.playbackRate = 1.75;
+  music.play().catch(e=>console.log('Autoplay ma khddamch:', e));
+});
 
-// Page 2: love question with sweet message
-function loveYes(){
-  // Show sweet message first
-  const msg = document.getElementById('loveMsg');
-  msg.textContent = "I knew it…  tana tanbghik ktr 💍❤️";
-  msg.style.display = 'block';
-  
-  // Floating hearts burst
-  for(let i=0;i<20;i++){
-    setTimeout(createFloatingHeart, i*150);
-  }
-  
-  // Move to next page after 3 seconds
-  setTimeout(()=>nextPage('page3'),3000);
-}
+// Page 2: love question
+function loveYes(){nextPage('page3');}
 
 // Page 1 rain hearts & emojis
 function createRain(){
