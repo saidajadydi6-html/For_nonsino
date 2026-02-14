@@ -75,7 +75,7 @@ button {
 <!-- Page 1: Intro with hearts & emojis rain -->
 <section id="page1">
   <h1>💖 Welcome nonosi 💖</h1>
-  <button onclick="nextPage('page2')">Next</button>
+  <button onclick="startMusic()">Next</button>
 </section>
 
 <!-- Page 2: Do you love me -->
@@ -107,6 +107,9 @@ button {
   <div id="allAnswers" style="margin-top:30px; font-size:18px;"></div>
 </section>
 
+<!-- Music -->
+<audio id="music" src="CinnamonGirl.mp3" loop></audio>
+
 <script>
 // ===== Variables =====
 let currentQ=0;
@@ -130,9 +133,17 @@ const questions=[
 // ===== Functions =====
 function showPage(id){document.querySelectorAll('section').forEach(s=>s.style.display='none'); document.getElementById(id).style.display='block';}
 function nextPage(id){showPage(id);}
+
+// ===== Page 1: start music + next page =====
+function startMusic(){
+  document.getElementById("music").play().catch(e=>console.log(e));
+  nextPage('page2');
+}
+
+// Page 2: love question
 function loveYes(){nextPage('page3');}
 
-// ===== Page 1 rain hearts & emojis =====
+// Page 1 rain hearts & emojis
 function createRain(){
   const symbols=['❤️','💖','😻','😺','💞'];
   const el=document.createElement('div');
@@ -147,12 +158,19 @@ function createRain(){
 }
 setInterval(createRain,300);
 
-// Step 3: Secret code (optional)
+// Step 3: Verify secret code
 document.getElementById("imageInput").addEventListener("change",function(){
   const file=this.files[0];
-  // For testing, accept any file
-  alert("Code received! 🎉 Starting quiz...");
-  nextPage('page4'); showQuestion();
+  const reader=new FileReader();
+  reader.onload=async function(){
+    const buffer=reader.result;
+    const hashBuffer=await crypto.subtle.digest('SHA-256',buffer);
+    const hashArray=Array.from(new Uint8Array(hashBuffer));
+    const hashHex=hashArray.map(b=>b.toString(16).padStart(2,'0')).join('');
+    if(hashHex===correctHash){alert("Code sahih! 🎉 bda daba Quizí."); nextPage('page4'); showQuestion();}
+    else{alert("Code ghalt 3awd 3atany ❌");}
+  }
+  reader.readAsArrayBuffer(file);
 });
 
 // Step 4: Quiz
@@ -174,7 +192,7 @@ function displayAnswers(){
   div.innerHTML="<h3>Your Answers:</h3><ol>"+userAnswers.map(a=>`<li>${a}</li>`).join('')+"</ol>";
 }
 
-// Floating hearts for pages 2–5
+// Extra floating hearts for pages 2–5
 function createFloatingHeart(){
   if(['page2','page3','page4','page5'].some(id=>document.getElementById(id).style.display==='block')){
     const heart=document.createElement('div');
